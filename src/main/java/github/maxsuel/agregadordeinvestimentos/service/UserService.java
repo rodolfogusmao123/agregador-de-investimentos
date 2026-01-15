@@ -1,6 +1,6 @@
 package github.maxsuel.agregadordeinvestimentos.service;
 
-import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +34,10 @@ public class UserService {
 
     public Optional<User> getUserById(String userId) {
         return userRepository.findById(UUID.fromString(userId));
+    }
+
+    public List<User> listAllUsers() {
+        return userRepository.findAll();
     }
 
 }

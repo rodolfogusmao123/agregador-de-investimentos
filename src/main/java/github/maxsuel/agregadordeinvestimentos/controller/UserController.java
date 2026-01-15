@@ -1,6 +1,7 @@
 package github.maxsuel.agregadordeinvestimentos.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,11 @@ public class UserController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<User>> listAllUsers() {
+        return ResponseEntity.ok(userService.listAllUsers());
     }
 
 }
