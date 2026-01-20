@@ -3,6 +3,7 @@ package github.maxsuel.agregadordeinvestimentos.controller;
 import java.net.URI;
 import java.util.List;
 
+import github.maxsuel.agregadordeinvestimentos.dto.CreateAccountDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") String userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(path = "/{userId}/accounts")
+    public ResponseEntity<Void> createAccount(@PathVariable("userId") String userId,
+                                              @RequestBody CreateAccountDto createAccountDto) {
+        userService.createAccount(userId, createAccountDto);
+        return ResponseEntity.ok().build();
     }
 
 }
