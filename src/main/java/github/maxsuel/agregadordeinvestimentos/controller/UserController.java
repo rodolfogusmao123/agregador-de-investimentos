@@ -3,6 +3,7 @@ package github.maxsuel.agregadordeinvestimentos.controller;
 import java.net.URI;
 import java.util.List;
 
+import github.maxsuel.agregadordeinvestimentos.dto.AccountResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.CreateAccountDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,11 +38,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable("userId") String userId) {
         var user = userService.getUserById(userId);
 
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(path = "/all")
@@ -68,6 +65,13 @@ public class UserController {
                                               @RequestBody CreateAccountDto createAccountDto) {
         userService.createAccount(userId, createAccountDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(path = "/{userId}/accounts")
+    public ResponseEntity<List<AccountResponseDto>> listAllAccounts(@PathVariable("userId") String userId) {
+        var accounts = userService.listAllAccounts(userId);
+
+        return ResponseEntity.ok(accounts);
     }
 
 }

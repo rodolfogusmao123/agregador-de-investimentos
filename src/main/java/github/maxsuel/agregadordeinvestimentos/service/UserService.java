@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import github.maxsuel.agregadordeinvestimentos.dto.AccountResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.CreateAccountDto;
 import github.maxsuel.agregadordeinvestimentos.entity.Account;
 import github.maxsuel.agregadordeinvestimentos.entity.BillingAddress;
@@ -107,5 +108,17 @@ public class UserService {
         );
 
         billingAddressRepository.save(billingAddress);
+    }
+
+    public List<AccountResponseDto> listAllAccounts(String userId) {
+        var user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        return user.getAccounts()
+                .stream()
+                .map(ac -> new AccountResponseDto(ac.getAccountId().toString(), ac.getDescription()))
+                .toList();
+
+
     }
 }
