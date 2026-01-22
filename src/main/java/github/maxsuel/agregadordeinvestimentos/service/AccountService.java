@@ -1,5 +1,6 @@
 package github.maxsuel.agregadordeinvestimentos.service;
 
+import github.maxsuel.agregadordeinvestimentos.client.BrapiClient;
 import github.maxsuel.agregadordeinvestimentos.dto.AccountStockResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.AssociateAccountStockDto;
 import github.maxsuel.agregadordeinvestimentos.entity.AccountStock;
@@ -8,6 +9,7 @@ import github.maxsuel.agregadordeinvestimentos.repository.AccountRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountStockRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,9 +21,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountService {
 
+    @Value("#{environment.TOKEN}")
+    private String TOKEN; // Brapi API token
+
     private final AccountRepository accountRepository;
     private final StockRepository stockRepository;
     private final AccountStockRepository accountStockRepository;
+    private final BrapiClient brapiClient;
 
     public void associateStock(String accountId, AssociateAccountStockDto dto) {
         var account = accountRepository.findById(UUID.fromString(accountId))
@@ -48,8 +54,19 @@ public class AccountService {
         return account.getAccountStocks()
                 .stream()
                 .map(
-                        as -> new AccountStockResponseDto(as.getStock().getStockId(), as.getQuantity(), 0.0)
+                        as -> new AccountStockResponseDto(
+                                as.getStock().getStockId(),
+                                as.getQuantity(),
+                                getTotal(as.getQuantity(), as.getStock().getStockId()))
                 )
                 .toList();
+    }
+
+    private double getTotal(Integer quantity, String stockId) {
+        var response = brapiClient.getQuote(TOKEN, stockId);
+
+        var price = response.results().getFirst().regularMarketPrice();
+
+        return quantity * price;
     }
 }
