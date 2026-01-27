@@ -1,22 +1,28 @@
 package github.maxsuel.agregadordeinvestimentos.controller;
 
-import github.maxsuel.agregadordeinvestimentos.dto.CreateUserDto;
-import github.maxsuel.agregadordeinvestimentos.dto.LoginDto;
-import github.maxsuel.agregadordeinvestimentos.service.AuthService;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import github.maxsuel.agregadordeinvestimentos.dto.CreateUserDto;
+import github.maxsuel.agregadordeinvestimentos.dto.LoginDto;
+import github.maxsuel.agregadordeinvestimentos.dto.LoginResponseDto;
+import github.maxsuel.agregadordeinvestimentos.service.AuthService;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
@@ -58,7 +64,7 @@ public class AuthControllerTest {
         public void shouldLoginWithSuccess() {
             // Arrange
             var loginDto = new LoginDto("username", "123");
-            var mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // Fake token
+            var mockToken = new LoginResponseDto("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."); // Fake token
 
             when(authService.login(loginDto)).thenReturn(mockToken);
 

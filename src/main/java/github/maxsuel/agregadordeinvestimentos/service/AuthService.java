@@ -1,8 +1,15 @@
 package github.maxsuel.agregadordeinvestimentos.service;
 
+import java.util.UUID;
+
+import org.jspecify.annotations.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import github.maxsuel.agregadordeinvestimentos.config.TokenService;
 import github.maxsuel.agregadordeinvestimentos.dto.CreateUserDto;
 import github.maxsuel.agregadordeinvestimentos.dto.LoginDto;
+import github.maxsuel.agregadordeinvestimentos.dto.LoginResponseDto;
 import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.entity.enums.Role;
 import github.maxsuel.agregadordeinvestimentos.exceptions.UserNotFoundException;
@@ -10,11 +17,6 @@ import github.maxsuel.agregadordeinvestimentos.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +44,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String login(@NonNull LoginDto dto) {
+    public LoginResponseDto login(@NonNull LoginDto dto) {
         var user = userRepository.findByUsername(dto.username())
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
 
@@ -50,7 +52,8 @@ public class AuthService {
             throw new org.springframework.security.authentication.BadCredentialsException("Invalid username or password");
         }
 
-        return tokenService.generateToken(user);
+        var token = tokenService.generateToken(user);
+        return new LoginResponseDto(token);
     }
 
 }
