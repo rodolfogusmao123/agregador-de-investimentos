@@ -48,10 +48,11 @@ Tratamento centralizado de erros que fornece respostas claras e seguras via DTOs
 A documentação completa e interativa (Swagger UI) pode ser acessada em: `http://localhost:8080/swagger-ui.html`.
 
 ### 🔐 Autenticação (Acesso Público)
-| Método | Endpoint | Descrição |
-| :--- | :--- | :--- |
-| `POST` | `/auth/register` | Registra um novo usuário no sistema. |
-| `POST` | `/auth/login` | Autentica e retorna um Bearer Token JWT. |
+| Método | Endpoint         | Descrição                                |
+|:-------|:-----------------|:-----------------------------------------|
+| `POST` | `/auth/register` | Registra um novo usuário no sistema.     |
+| `POST` | `/auth/login`    | Autentica e retorna um Bearer Token JWT. |
+| `GET`  | `/auth/me`       | Retorna os dados do usuário autenticado. |
 
 ### 👤 Usuários (Requer Autenticação)
 | Método | Endpoint | Descrição |
