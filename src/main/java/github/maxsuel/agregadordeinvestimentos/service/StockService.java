@@ -5,6 +5,7 @@ import github.maxsuel.agregadordeinvestimentos.entity.Stock;
 import github.maxsuel.agregadordeinvestimentos.repository.StockRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +15,7 @@ public class StockService {
     private final StockRepository stockRepository;
 
     @Transactional
-    public void createStock(CreateStockDto createStockDto) {
+    public void createStock(@NonNull CreateStockDto createStockDto) {
         var stock = new Stock(
                 createStockDto.stockId(),
                 createStockDto.description()
