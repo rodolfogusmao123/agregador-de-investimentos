@@ -65,4 +65,12 @@ public class AuthService {
         return new AuthResponseDto(token, userDto);
     }
 
+    public UserDto getAuthenticatedUserDto(User user) {
+        if (user == null) {
+            throw new BadCredentialsException("User not authenticated");
+        }
+
+        return userMapper.toDto(user);
+    }
+
 }

@@ -112,12 +112,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        UserDto userDto = new UserDto(
-            user.getUserId().toString(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getRole()
-        );
+        var userDto = authService.getAuthenticatedUserDto(user);
 
         return ResponseEntity.ok(userDto);
     }
