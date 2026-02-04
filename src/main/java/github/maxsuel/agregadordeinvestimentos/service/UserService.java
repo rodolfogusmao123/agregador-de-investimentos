@@ -8,6 +8,7 @@ import github.maxsuel.agregadordeinvestimentos.dto.AccountResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.CreateAccountDto;
 import github.maxsuel.agregadordeinvestimentos.entity.BillingAddress;
 import github.maxsuel.agregadordeinvestimentos.mapper.AccountMapper;
+import github.maxsuel.agregadordeinvestimentos.mapper.BillingAddressMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.BillingAddressRepository;
 import lombok.NonNull;
@@ -32,6 +33,7 @@ public class UserService {
     private final BillingAddressRepository billingAddressRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountMapper accountMapper;
+    private final BillingAddressMapper billingAddressMapper;
 
     public Optional<User> getUserById(String userId) {
         return userRepository.findById(UUID.fromString(userId));
@@ -82,12 +84,7 @@ public class UserService {
         var account = accountMapper.toEntity(createAccountDto, user);
         var accountSaved = accountRepository.save(account);
 
-        var billingAddress = new BillingAddress(
-                accountSaved.getAccountId(),
-                accountSaved,
-                createAccountDto.street(),
-                createAccountDto.number()
-        );
+        var billingAddress = billingAddressMapper.toEntity(createAccountDto, accountSaved);
 
         billingAddressRepository.save(billingAddress);
         log.info("Account and BillingAddress created for user: {}", userId);
@@ -99,7 +96,7 @@ public class UserService {
 
         return user.getAccounts()
                 .stream()
-                .map(ac -> new AccountResponseDto(ac.getAccountId().toString(), ac.getDescription()))
+                .map(accountMapper::toDto)
                 .toList();
     }
 }
