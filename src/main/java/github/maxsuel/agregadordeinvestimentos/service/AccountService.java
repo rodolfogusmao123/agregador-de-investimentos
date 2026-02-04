@@ -7,6 +7,7 @@ import github.maxsuel.agregadordeinvestimentos.dto.AssociateAccountStockDto;
 import github.maxsuel.agregadordeinvestimentos.entity.AccountStock;
 import github.maxsuel.agregadordeinvestimentos.entity.AccountStockId;
 import github.maxsuel.agregadordeinvestimentos.exceptions.AccountNotFoundException;
+import github.maxsuel.agregadordeinvestimentos.mapper.AccountStockMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountStockRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.StockRepository;
@@ -37,6 +38,7 @@ public class AccountService {
     private final StockRepository stockRepository;
     private final AccountStockRepository accountStockRepository;
     private final BrapiClient brapiClient;
+    private final AccountStockMapper accountStockMapper;
 
     @Transactional
     public void associateStock(String accountId, @NonNull AssociateAccountStockDto dto) {
@@ -68,28 +70,14 @@ public class AccountService {
                     var response = brapiClient.getQuote(TOKEN, as.getStock().getStockId());
                     var stockInfo = response.results().getFirst();
 
-                    double price = stockInfo.regularMarketPrice();
-                    double totalRaw = as.getQuantity() * price;
-
-                    double totalRounded = BigDecimal.valueOf(totalRaw)
-                            .setScale(2, RoundingMode.HALF_UP)
-                            .doubleValue();
-
-                    return new AccountStockResponseDto(
-                            as.getStock().getStockId(),
-                            stockInfo.shortName(),
-                            as.getQuantity(),
-                            price,
-                            totalRounded,
-                            stockInfo.logourl()
-                    );
+                    return accountStockMapper.toDto(as, stockInfo);
                 })
                 .toList();
     }
 
     public List<AccountStockResponseDto> fallbackListStocks(String accountId, Throwable t) {
         return List.of(new AccountStockResponseDto(
-                "N/A", "Service unavailable", 0, 0.0, 0.0, ""
+                "N/A", "Service unavailable", "Service unavailable", 0, 0.0, 0.0, ""
         ));
     }
 

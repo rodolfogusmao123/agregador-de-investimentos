@@ -66,6 +66,7 @@ class AccountServiceTest {
         var stockDto = new github.maxsuel.agregadordeinvestimentos.dto.StockDto(
                 "PETR4",
                 "Petrobras PN",
+                "Petroleo Brasileiro SA Pfd",
                 marketPrice,
                 "BRL",
                 "https://icons.brapi.dev/icons/PETR4.svg"

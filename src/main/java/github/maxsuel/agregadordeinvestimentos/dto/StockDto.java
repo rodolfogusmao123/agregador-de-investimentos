@@ -20,6 +20,12 @@ public record StockDto(
     String shortName,
 
     @Schema(
+            description = "Long display name of the company or stock",
+            example = "Petroleo Brasileiro SA Pfd"
+    )
+    String longName,
+
+    @Schema(
         description = "Current market price of the stock",
         example = "38.50"
     )

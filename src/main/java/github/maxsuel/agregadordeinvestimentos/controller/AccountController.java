@@ -77,9 +77,7 @@ public class AccountController {
         )
     )
     @GetMapping(path = "/{accountId}/stocks")
-    public ResponseEntity<List<AccountStockResponseDto>> listAllStocks(
-        @PathVariable("accountId") String accountId
-    ) {
+    public ResponseEntity<List<AccountStockResponseDto>> listAllStocks(@PathVariable("accountId") String accountId) {
         var stocks = accountService.listAllStocks(accountId);
 
         return ResponseEntity.ok(stocks);
