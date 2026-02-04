@@ -98,16 +98,14 @@ public class AccountService {
         double total = account.getAccountStocks().stream()
                 .mapToDouble(as -> {
                     var stockData = response.results().stream()
-                            .filter(r -> r.stock().equals(as.getStock().getStockId()))
+                            .filter(r -> r != null && as.getStock().getStockId().equals(r.stock()))
                             .findFirst()
                             .orElseThrow();
-                    return stockData.regularMarketPrice() * as.getQuantity();
+                    return as.getQuantity() * stockData.regularMarketPrice();
                 })
                 .sum();
 
-        double roundedTotal = BigDecimal.valueOf(total)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
+        double roundedTotal = accountStockMapper.calculateTotal(1.0, total);
 
         return new AccountBalanceDto(accountId, roundedTotal, Instant.now());
     }
