@@ -36,7 +36,7 @@ public class UserRepositoryTest {
 
         // Assert
         assertThat(result).isPresent();
-        assertThat(result.get().getUsername()).isEqualTo("max");
+        assertThat(result.get().getUsername()).isEqualTo("username");
     }
 
     @Test
