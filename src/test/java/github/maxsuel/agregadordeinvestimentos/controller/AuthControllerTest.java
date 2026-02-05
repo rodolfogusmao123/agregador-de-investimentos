@@ -19,9 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 
-import github.maxsuel.agregadordeinvestimentos.dto.AuthResponseDto;
-import github.maxsuel.agregadordeinvestimentos.dto.CreateUserDto;
-import github.maxsuel.agregadordeinvestimentos.dto.LoginDto;
+import github.maxsuel.agregadordeinvestimentos.dto.response.auth.AuthResponseDto;
+import github.maxsuel.agregadordeinvestimentos.dto.request.auth.CreateUserDto;
+import github.maxsuel.agregadordeinvestimentos.dto.request.auth.LoginDto;
 import github.maxsuel.agregadordeinvestimentos.service.AuthService;
 
 @ExtendWith(MockitoExtension.class)

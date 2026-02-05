@@ -1,8 +1,8 @@
 package github.maxsuel.agregadordeinvestimentos.service;
 
 import github.maxsuel.agregadordeinvestimentos.config.TokenService;
-import github.maxsuel.agregadordeinvestimentos.dto.CreateUserDto;
-import github.maxsuel.agregadordeinvestimentos.dto.LoginDto;
+import github.maxsuel.agregadordeinvestimentos.dto.request.auth.CreateUserDto;
+import github.maxsuel.agregadordeinvestimentos.dto.request.auth.LoginDto;
 import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.entity.enums.Role;
 import github.maxsuel.agregadordeinvestimentos.exceptions.UserNotFoundException;

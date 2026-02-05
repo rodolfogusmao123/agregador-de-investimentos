@@ -1,7 +1,8 @@
 package github.maxsuel.agregadordeinvestimentos.service;
 
 import github.maxsuel.agregadordeinvestimentos.client.BrapiClient;
-import github.maxsuel.agregadordeinvestimentos.dto.BrapiResponseDto;
+import github.maxsuel.agregadordeinvestimentos.dto.external.brapi.BrapiResponseDto;
+import github.maxsuel.agregadordeinvestimentos.dto.external.brapi.StockDto;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class AccountServiceTest {
 
         account.getAccountStocks().add(accountStock);
 
-        var stockDto = new github.maxsuel.agregadordeinvestimentos.dto.StockDto(
+        var stockDto = new StockDto(
                 "PETR4",
                 "Petrobras PN",
                 "Petroleo Brasileiro SA Pfd",
