@@ -1,7 +1,10 @@
 package github.maxsuel.agregadordeinvestimentos.dto.response.account;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 @Schema(description = "Response with user account details")
 public record AccountResponseDto(
@@ -18,6 +21,14 @@ public record AccountResponseDto(
         description = "Friendly description of the account",
         example = "Main account"
     )
-    String description
+    String description,
+
+    @ArraySchema(
+            schema = @Schema(
+                    implementation = AccountStockResponseDto.class,
+                    description = "List of stocks held in this account with real-time prices"
+            )
+    )
+    List<AccountStockResponseDto> stocks
 ) {
 }
