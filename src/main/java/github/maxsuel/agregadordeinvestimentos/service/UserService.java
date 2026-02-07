@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import github.maxsuel.agregadordeinvestimentos.dto.response.account.AccountResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.request.account.CreateAccountDto;
+import github.maxsuel.agregadordeinvestimentos.dto.response.account.AccountStockResponseDto;
 import github.maxsuel.agregadordeinvestimentos.mapper.AccountMapper;
 import github.maxsuel.agregadordeinvestimentos.mapper.BillingAddressMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountRepository;
@@ -29,6 +30,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final BillingAddressRepository billingAddressRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountMapper accountMapper;
@@ -95,7 +97,11 @@ public class UserService {
 
         return user.getAccounts()
                 .stream()
-                .map(accountMapper::toDto)
+                .map(account -> {
+                    List<AccountStockResponseDto> stocks = accountService.listAllStocks(account.getAccountId().toString());
+
+                    return accountMapper.toDto(account, stocks);
+                })
                 .toList();
     }
 }

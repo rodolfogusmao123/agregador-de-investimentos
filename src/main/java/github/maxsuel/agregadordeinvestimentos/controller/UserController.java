@@ -101,10 +101,8 @@ public class UserController {
         )
     })
     @PutMapping(path = "/{userId}")
-    public ResponseEntity<Void> updateUserById(
-        @PathVariable("userId") String userId,
-        @Valid @RequestBody UpdateUserDto updateUserDto
-    ) {
+    public ResponseEntity<Void> updateUserById(@PathVariable("userId") String userId,
+                                               @Valid @RequestBody UpdateUserDto updateUserDto) {
         userService.updateUserById(userId, updateUserDto);
         return ResponseEntity.noContent().build();
     }
@@ -134,41 +132,30 @@ public class UserController {
         content = @Content
     )
     @PostMapping(path = "/{userId}/accounts")
-    public ResponseEntity<Void> createAccount(
-        @PathVariable("userId") String userId,
-        @Valid @RequestBody CreateAccountDto createAccountDto
-    ) {
+    public ResponseEntity<Void> createAccount(@PathVariable("userId") String userId,
+                                              @Valid @RequestBody CreateAccountDto createAccountDto) {
         userService.createAccount(userId, createAccountDto);
         return ResponseEntity.ok().build();
     }
 
     @Operation(
-        summary = "List all accounts associated with a user.", 
-        description = "Retrieves all investment portfolios linked to the user."
+            summary = "List all accounts with their portfolios.",
+            description = "Retrieves all investment accounts associated with a user, including the full list of stocks and their real-time market prices."
     )
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200", 
-            description = "Accounts retrieved successfully.", 
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                array = @ArraySchema(
-                    schema = @Schema(implementation = AccountResponseDto.class)
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404", 
-            description = "User not found.", 
-            content = @Content
-        )
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User accounts and stock portfolios retrieved successfully.",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = AccountResponseDto.class))
+                    )
+            ),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content)
     })
     @GetMapping(path = "/{userId}/accounts")
-    public ResponseEntity<List<AccountResponseDto>> listAllAccounts(
-        @PathVariable("userId") String userId
-    ) {
+    public ResponseEntity<List<AccountResponseDto>> listAllAccounts(@PathVariable("userId") String userId) {
         var accounts = userService.listAllAccounts(userId);
-
         return ResponseEntity.ok(accounts);
     }
 }
