@@ -3,6 +3,7 @@ package github.maxsuel.agregadordeinvestimentos.config;
 import java.io.IOException;
 import java.util.List;
 
+import github.maxsuel.agregadordeinvestimentos.service.BlacklistService;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,12 +25,21 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final BlacklistService blacklistService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         var token = this.recoverToken(request);
 
         if (token != null) {
+            if (blacklistService.getBlacklistedToken(token) != null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token has been invalidated (Logged out).");
+                return;
+            }
+
             var login = tokenService.validateToken(token);
 
             if (!login.isEmpty()) {
@@ -55,6 +65,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     private @Nullable String recoverToken(@NonNull HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null) return null;
+
         return authHeader.replace("Bearer ", "");
     }
 }

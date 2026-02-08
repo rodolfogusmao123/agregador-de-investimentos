@@ -2,6 +2,8 @@ package github.maxsuel.agregadordeinvestimentos.controller;
 
 import java.net.URI;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -115,5 +117,22 @@ public class AuthController {
         var userDto = authService.getAuthenticatedUserDto(user);
 
         return ResponseEntity.ok(userDto);
+    }
+
+    @Operation(
+            summary = "Logout user",
+            description = "Invalidates the current JWT token by adding it to a server-side blacklist.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Logged out successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@NonNull HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        authService.logout(authHeader);
+
+        return ResponseEntity.noContent().build();
     }
 }
