@@ -27,6 +27,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final BlacklistService blacklistService;
 
     @Transactional
     public AuthResponseDto register(@NonNull CreateUserDto createUserDto) {
@@ -71,6 +72,15 @@ public class AuthService {
         }
 
         return userMapper.toDto(user);
+    }
+
+    public void logout(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.replace("Bearer ", "");
+            blacklistService.blacklistToken(token);
+
+            log.info("Token added to blacklist");
+        }
     }
 
 }

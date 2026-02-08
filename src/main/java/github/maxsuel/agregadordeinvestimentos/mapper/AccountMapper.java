@@ -17,6 +17,7 @@ public interface AccountMapper {
     @Mapping(target = "user", source = "user")
     @Mapping(target = "description", source = "createAccountDto.description")
     @Mapping(target = "accountStocks", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "billingAddress", ignore = true)
     Account toEntity(CreateAccountDto createAccountDto, User user) ;
 
     @Mapping(target = "accountId", source = "account.accountId")
