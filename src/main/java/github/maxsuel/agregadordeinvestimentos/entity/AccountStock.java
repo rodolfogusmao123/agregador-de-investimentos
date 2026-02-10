@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "account_stocks")
 @NoArgsConstructor
@@ -33,5 +35,8 @@ public class AccountStock {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
+    @Column(name = "average_price", precision = 19, scale = 4)
+    private BigDecimal average_price = BigDecimal.ZERO;
 
 }

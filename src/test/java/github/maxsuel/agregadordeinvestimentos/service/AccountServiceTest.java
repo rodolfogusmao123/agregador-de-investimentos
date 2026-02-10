@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -84,7 +85,8 @@ class AccountServiceTest {
                 accountStockId,
                 account,
                 stock,
-                quantity
+                quantity,
+                BigDecimal.ZERO
         );
 
         account.getAccountStocks().add(accountStock);

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +52,8 @@ public class AccountService {
                 id,
                 account,
                 stock,
-                dto.quantity()
+                dto.quantity(),
+                BigDecimal.ZERO
         );
 
         accountStockRepository.save(entity);

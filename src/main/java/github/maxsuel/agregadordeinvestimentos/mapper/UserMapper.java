@@ -15,6 +15,7 @@ public interface UserMapper {
     @Mapping(target = "updateTimestamp", ignore = true)
     @Mapping(target = "accounts", ignore = true)
     @Mapping(target = "role", constant = "ADMIN")
+    @Mapping(target = "cash", ignore = true)
     User toEntity(CreateUserDto createUserDto, String encodedPassword);
 
     UserDto toDto(User entity);
