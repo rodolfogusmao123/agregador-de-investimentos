@@ -39,16 +39,18 @@ public class TradeService {
         BigDecimal currentPrice = BigDecimal.valueOf(response.results().getFirst().regularMarketPrice());
         BigDecimal totalCost = currentPrice.multiply(BigDecimal.valueOf(dto.quantity()));
 
-        if (user.getCash().compareTo(totalCost) < 0) {
-            throw new InsufficientFundsException("Insufficient funds. Current balance: $ " + user.getCash());
+        BigDecimal userCash = (user.getCash() != null) ? user.getCash() : BigDecimal.ZERO;
+
+        if (userCash.compareTo(totalCost) < 0) {
+            throw new InsufficientFundsException("Insufficient funds. Current balance: $ " + userCash);
         }
 
         var account = accountRepository.findById(dto.accountId())
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
         var stock = stockRepository.findById(dto.stockId())
                 .orElseThrow(() -> new StockNotFoundException("Stock ticker not recognized"));
-        var id = new AccountStockId(dto.accountId(), dto.stockId());
 
+        var id = new AccountStockId(dto.accountId(), dto.stockId());
         AccountStock accountStock = accountStockRepository.findById(id)
                 .orElse(new AccountStock(id, account, stock, 0, BigDecimal.ZERO));
 
@@ -60,10 +62,9 @@ public class TradeService {
 
         accountStock.setQuantity(totalQuantity);
         accountStock.setAveragePrice(newAveragePrice);
-
         accountStockRepository.save(accountStock);
 
-        user.setCash(user.getCash().subtract(totalCost));
+        user.setCash(userCash.subtract(totalCost));
         userRepository.save(user);
 
         saveLog(user, account, stock, dto.quantity(), currentPrice, TradeType.BUY);
@@ -80,9 +81,10 @@ public class TradeService {
         }
 
         var response = brapiClient.getQuote(TOKEN, dto.stockId());
-
         BigDecimal currentPrice = BigDecimal.valueOf(response.results().getFirst().regularMarketPrice());
         BigDecimal totalReceive = currentPrice.multiply(BigDecimal.valueOf(dto.quantity()));
+
+        BigDecimal currentCash = (user.getCash() != null) ? user.getCash() : BigDecimal.ZERO;
 
         accountStock.setQuantity(accountStock.getQuantity() - dto.quantity());
 
@@ -92,7 +94,7 @@ public class TradeService {
             accountStockRepository.save(accountStock);
         }
 
-        user.setCash(user.getCash().add(totalReceive));
+        user.setCash(currentCash.add(totalReceive));
         userRepository.save(user);
 
         saveLog(user, accountStock.getAccount(), accountStock.getStock(), dto.quantity(), currentPrice, TradeType.SELL);

@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 public interface TransactionMapper {
 
     @Mapping(target = "stockId", source = "stock.stockId")
-    @Mapping(target = "totalValue", expression = "java(transactions.getPriceAtTime().multiply(java.math.BigDecimal.valueOf(tx.getQuantity())))")
+    @Mapping(target = "totalValue", expression = "java(transactions.getPriceAtTime().multiply(java.math.BigDecimal.valueOf(transactions.getQuantity())))")
     TransactionsResponseDto toDto(Transactions transactions);
 
 }

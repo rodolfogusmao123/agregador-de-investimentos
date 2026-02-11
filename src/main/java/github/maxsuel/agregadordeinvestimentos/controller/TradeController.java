@@ -3,7 +3,6 @@ package github.maxsuel.agregadordeinvestimentos.controller;
 import github.maxsuel.agregadordeinvestimentos.dto.request.stock.TradeRequestDto;
 import github.maxsuel.agregadordeinvestimentos.dto.response.stock.TransactionsResponseDto;
 import github.maxsuel.agregadordeinvestimentos.entity.User;
-import github.maxsuel.agregadordeinvestimentos.exceptions.UserNotFoundException;
 import github.maxsuel.agregadordeinvestimentos.exceptions.dto.ErrorResponseDto;
 import github.maxsuel.agregadordeinvestimentos.mapper.TransactionMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.TransactionsRepository;
@@ -19,12 +18,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/trades")
@@ -54,9 +53,11 @@ public class TradeController {
     })
     @PostMapping("/buy")
     public ResponseEntity<Void> buy(@RequestBody @Valid TradeRequestDto dto,
-                                    @Parameter(hidden = true) @AuthenticationPrincipal String userId) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                                    @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         tradeService.executeBuy(user, dto);
 
         return ResponseEntity.ok().build();
@@ -76,9 +77,11 @@ public class TradeController {
     })
     @PostMapping("/sell")
     public ResponseEntity<Void> sell(@RequestBody @Valid TradeRequestDto dto,
-                                     @Parameter(hidden = true) @AuthenticationPrincipal String userId) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                                     @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         tradeService.executeSell(user, dto);
 
         return ResponseEntity.ok().build();
@@ -96,9 +99,13 @@ public class TradeController {
                          content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
     })
     @GetMapping("/history")
-    public ResponseEntity<List<TransactionsResponseDto>> getHistory(@Parameter(hidden = true) @AuthenticationPrincipal String userId) {
+    public ResponseEntity<List<TransactionsResponseDto>> getHistory(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         return ResponseEntity.ok(
-                transactionsRepository.findAllByUser(UUID.fromString(userId))
+                transactionsRepository.findAllByUser_UserId(user.getUserId())
                         .stream()
                         .map(transactionMapper::toDto)
                         .toList()

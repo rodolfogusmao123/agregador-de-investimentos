@@ -2,13 +2,14 @@ package github.maxsuel.agregadordeinvestimentos.repository;
 
 import github.maxsuel.agregadordeinvestimentos.entity.Transactions;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface TransactionsRepository extends JpaRepository<Transactions, UUID> {
+@Repository
+public interface TransactionsRepository extends JpaRepository<Transactions, Long> {
 
-    List<Transactions> findAllByUser(UUID userId);
-    List<Transactions> findAllByAccount(UUID accountId);
+    List<Transactions> findAllByUser_UserId(UUID userId);
 
 }
