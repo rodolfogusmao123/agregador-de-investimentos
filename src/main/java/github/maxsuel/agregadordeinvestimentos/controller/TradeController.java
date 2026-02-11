@@ -5,6 +5,7 @@ import github.maxsuel.agregadordeinvestimentos.dto.response.stock.TransactionsRe
 import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.exceptions.UserNotFoundException;
 import github.maxsuel.agregadordeinvestimentos.exceptions.dto.ErrorResponseDto;
+import github.maxsuel.agregadordeinvestimentos.mapper.TransactionMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.TransactionsRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.UserRepository;
 import github.maxsuel.agregadordeinvestimentos.service.TradeService;
@@ -22,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +38,7 @@ public class TradeController {
     private final TradeService tradeService;
     private final UserRepository userRepository;
     private final TransactionsRepository transactionsRepository;
+    private final TransactionMapper transactionMapper;
 
     @Operation(
             summary = "Execute a buy order",
@@ -96,20 +97,12 @@ public class TradeController {
     })
     @GetMapping("/history")
     public ResponseEntity<List<TransactionsResponseDto>> getHistory(@Parameter(hidden = true) @AuthenticationPrincipal String userId) {
-        var transactions = transactionsRepository.findAllByUser(UUID.fromString(userId));
-
-        var response = transactions.stream()
-                .map(tx -> new TransactionsResponseDto(
-                    tx.getTransactionId(),
-                    tx.getStock().getStockId(),
-                    tx.getType(),
-                    tx.getQuantity(),
-                    tx.getPriceAtTime(),
-                    tx.getPriceAtTime().multiply(BigDecimal.valueOf(tx.getQuantity())),
-                    tx.getTimestamp()
-                )).toList();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                transactionsRepository.findAllByUser(UUID.fromString(userId))
+                        .stream()
+                        .map(transactionMapper::toDto)
+                        .toList()
+        );
     }
 
 }
