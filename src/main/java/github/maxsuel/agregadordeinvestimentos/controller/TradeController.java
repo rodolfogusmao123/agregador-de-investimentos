@@ -6,7 +6,6 @@ import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.exceptions.dto.ErrorResponseDto;
 import github.maxsuel.agregadordeinvestimentos.mapper.TransactionMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.TransactionsRepository;
-import github.maxsuel.agregadordeinvestimentos.repository.UserRepository;
 import github.maxsuel.agregadordeinvestimentos.service.TradeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +34,6 @@ import java.util.List;
 public class TradeController {
 
     private final TradeService tradeService;
-    private final UserRepository userRepository;
     private final TransactionsRepository transactionsRepository;
     private final TransactionMapper transactionMapper;
 
