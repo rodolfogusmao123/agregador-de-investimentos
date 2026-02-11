@@ -1,0 +1,115 @@
+package github.maxsuel.agregadordeinvestimentos.controller;
+
+import github.maxsuel.agregadordeinvestimentos.dto.request.stock.TradeRequestDto;
+import github.maxsuel.agregadordeinvestimentos.dto.response.stock.TransactionsResponseDto;
+import github.maxsuel.agregadordeinvestimentos.entity.User;
+import github.maxsuel.agregadordeinvestimentos.exceptions.UserNotFoundException;
+import github.maxsuel.agregadordeinvestimentos.exceptions.dto.ErrorResponseDto;
+import github.maxsuel.agregadordeinvestimentos.repository.TransactionsRepository;
+import github.maxsuel.agregadordeinvestimentos.repository.UserRepository;
+import github.maxsuel.agregadordeinvestimentos.service.TradeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/trades")
+@RequiredArgsConstructor
+@Tag(
+    name = "Trades",
+    description = "Endpoints for asset trading and transaction history"
+)
+public class TradeController {
+
+    private final TradeService tradeService;
+    private final UserRepository userRepository;
+    private final TransactionsRepository transactionsRepository;
+
+    @Operation(
+            summary = "Execute a buy order",
+            description = "Validates user cash, fetches real-time price, updates average price, and logs the transaction.",
+            operationId = "buyStock"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Purchase executed successfully"),
+            @ApiResponse(responseCode = "400", description = "Insufficient funds or invalid parameters",
+                         content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "User, Account or Stock not found",
+                         content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @PostMapping("/buy")
+    public ResponseEntity<Void> buy(@RequestBody @Valid TradeRequestDto dto,
+                                    @Parameter(hidden = true) @AuthenticationPrincipal String userId) {
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        tradeService.executeBuy(user, dto);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Execute a sell order",
+            description = "Verifies shares availability, credits cash to user, and logs the transaction.",
+            operationId = "sellStock"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sale successful"),
+            @ApiResponse(responseCode = "400", description = "Insufficient shares for the requested operation",
+                         content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Account or Asset not found",
+                         content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @PostMapping("/sell")
+    public ResponseEntity<Void> sell(@RequestBody @Valid TradeRequestDto dto,
+                                     @Parameter(hidden = true) @AuthenticationPrincipal String userId) {
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        tradeService.executeSell(user, dto);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Get transaction history",
+            description = "Returns a list of all buy and sell operations performed by the authenticated user.",
+            operationId = "getTransactionHistory"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of transactions retrieved",
+                         content = @Content(array = @ArraySchema(schema = @Schema(implementation = TransactionsResponseDto.class)))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access",
+                         content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @GetMapping("/history")
+    public ResponseEntity<List<TransactionsResponseDto>> getHistory(@Parameter(hidden = true) @AuthenticationPrincipal String userId) {
+        var transactions = transactionsRepository.findAllByUser(UUID.fromString(userId));
+
+        var response = transactions.stream()
+                .map(tx -> new TransactionsResponseDto(
+                    tx.getTransactionId(),
+                    tx.getStock().getStockId(),
+                    tx.getType(),
+                    tx.getQuantity(),
+                    tx.getPriceAtTime(),
+                    tx.getPriceAtTime().multiply(BigDecimal.valueOf(tx.getQuantity())),
+                    tx.getTimestamp()
+                )).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+}

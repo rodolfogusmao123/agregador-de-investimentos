@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class AccountStock {
     
     @EmbeddedId
@@ -37,6 +39,6 @@ public class AccountStock {
     private Integer quantity;
 
     @Column(name = "average_price", precision = 19, scale = 4)
-    private BigDecimal average_price = BigDecimal.ZERO;
+    private BigDecimal averagePrice = BigDecimal.ZERO;
 
 }

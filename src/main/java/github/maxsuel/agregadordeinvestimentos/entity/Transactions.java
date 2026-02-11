@@ -3,6 +3,7 @@ package github.maxsuel.agregadordeinvestimentos.entity;
 import github.maxsuel.agregadordeinvestimentos.entity.enums.TradeType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "transactions")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Transactions {
