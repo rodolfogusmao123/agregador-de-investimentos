@@ -102,4 +102,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
+
+    @ExceptionHandler({InsufficientFundsException.class, InsufficientSharesException.class})
+    public ResponseEntity<ErrorResponseDto> handleBusinessLogicErrors(@NonNull Exception ex) {
+        var errorResponse = new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                Instant.now(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler({AccountNotFoundException.class, StockNotFoundException.class})
+    public ResponseEntity<ErrorResponseDto> handleNotFound(@NonNull Exception ex) {
+        var errorResponse = new ErrorResponseDto(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                Instant.now(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
 }

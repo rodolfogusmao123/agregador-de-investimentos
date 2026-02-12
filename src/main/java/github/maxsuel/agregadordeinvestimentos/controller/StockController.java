@@ -5,6 +5,7 @@ import github.maxsuel.agregadordeinvestimentos.dto.response.stock.UserStockSumma
 import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.service.StockService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,7 +46,7 @@ public class StockController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @GetMapping
-    public ResponseEntity<List<UserStockSummaryDto>> getOwnedStocks(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<UserStockSummaryDto>> getOwnedStocks(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
         var ownedStocks = stockService.listOwnedStocks(user);
 
         return ResponseEntity.ok(ownedStocks);

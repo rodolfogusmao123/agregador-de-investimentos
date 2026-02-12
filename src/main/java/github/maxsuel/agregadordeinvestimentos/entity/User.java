@@ -1,5 +1,6 @@
 package github.maxsuel.agregadordeinvestimentos.entity;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal cash = new BigDecimal("1000.00");
 
     @CreationTimestamp
     private Instant creationTimestamp;

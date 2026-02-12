@@ -10,12 +10,16 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "account_stocks")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class AccountStock {
     
     @EmbeddedId
@@ -33,5 +37,8 @@ public class AccountStock {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
+    @Column(name = "average_price", precision = 19, scale = 4)
+    private BigDecimal averagePrice = BigDecimal.ZERO;
 
 }

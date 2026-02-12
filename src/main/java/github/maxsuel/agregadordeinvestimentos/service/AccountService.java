@@ -4,9 +4,12 @@ import github.maxsuel.agregadordeinvestimentos.client.BrapiClient;
 import github.maxsuel.agregadordeinvestimentos.dto.response.account.AccountBalanceDto;
 import github.maxsuel.agregadordeinvestimentos.dto.response.account.AccountStockResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.request.account.AssociateAccountStockDto;
+import github.maxsuel.agregadordeinvestimentos.dto.response.stock.PortfolioResponseDto;
 import github.maxsuel.agregadordeinvestimentos.entity.AccountStock;
 import github.maxsuel.agregadordeinvestimentos.entity.AccountStockId;
+import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.exceptions.AccountNotFoundException;
+import github.maxsuel.agregadordeinvestimentos.exceptions.StockNotFoundException;
 import github.maxsuel.agregadordeinvestimentos.mapper.AccountStockMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountRepository;
 import github.maxsuel.agregadordeinvestimentos.repository.AccountStockRepository;
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +56,8 @@ public class AccountService {
                 id,
                 account,
                 stock,
-                dto.quantity()
+                dto.quantity(),
+                BigDecimal.ZERO
         );
 
         accountStockRepository.save(entity);
@@ -107,4 +113,43 @@ public class AccountService {
 
         return new AccountBalanceDto(accountId, roundedTotal, Instant.now());
     }
+
+    public PortfolioResponseDto getCompletePortfolio(User user, String accountId) {
+        var account = accountRepository.findById(UUID.fromString(accountId))
+                .filter(acc -> acc.getUser().getUserId().equals(user.getUserId()))
+                .orElseThrow(() -> new AccountNotFoundException("Account not found or access denied."));
+
+        BigDecimal investedInStocks = BigDecimal.ZERO;
+
+        if (!account.getAccountStocks().isEmpty()) {
+            String tickers = account.getAccountStocks().stream()
+                    .map(as -> as.getStock().getStockId())
+                    .collect(Collectors.joining(","));
+
+            var response = brapiClient.getQuote(TOKEN, tickers);
+
+            double totalValue = account.getAccountStocks().stream()
+                    .mapToDouble(as -> {
+                        var stockData = response.results().stream()
+                                .filter(r -> r != null && as.getStock().getStockId().equals(r.stock()))
+                                .findFirst()
+                                .orElseThrow(() -> new StockNotFoundException("Price not found for: " + as.getStock().getStockId()));
+                        return as.getQuantity() * stockData.regularMarketPrice();
+                    })
+                    .sum();
+
+            investedInStocks = BigDecimal.valueOf(totalValue).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        BigDecimal availableCash = (user.getCash() != null) ? user.getCash() : BigDecimal.ZERO;
+        BigDecimal totalEquity = availableCash.add(investedInStocks);
+
+        return new PortfolioResponseDto(
+                availableCash,
+                investedInStocks,
+                totalEquity,
+                Instant.now()
+        );
+    }
+
 }

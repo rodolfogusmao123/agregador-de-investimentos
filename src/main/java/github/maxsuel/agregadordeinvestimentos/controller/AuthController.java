@@ -2,6 +2,7 @@ package github.maxsuel.agregadordeinvestimentos.controller;
 
 import java.net.URI;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
@@ -109,7 +110,7 @@ public class AuthController {
         description = "Unauthorized - invalid or missing JWT token"
     )
     @GetMapping("/me")
-    public ResponseEntity<UserDto> me(@AuthenticationPrincipal User user) {
+    public ResponseEntity<UserDto> me(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
