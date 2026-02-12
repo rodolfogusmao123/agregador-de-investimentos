@@ -1,11 +1,13 @@
 package github.maxsuel.agregadordeinvestimentos.controller;
 
 import github.maxsuel.agregadordeinvestimentos.dto.request.stock.TradeRequestDto;
+import github.maxsuel.agregadordeinvestimentos.dto.response.stock.PortfolioResponseDto;
 import github.maxsuel.agregadordeinvestimentos.dto.response.stock.TransactionsResponseDto;
 import github.maxsuel.agregadordeinvestimentos.entity.User;
 import github.maxsuel.agregadordeinvestimentos.exceptions.dto.ErrorResponseDto;
 import github.maxsuel.agregadordeinvestimentos.mapper.TransactionMapper;
 import github.maxsuel.agregadordeinvestimentos.repository.TransactionsRepository;
+import github.maxsuel.agregadordeinvestimentos.service.AccountService;
 import github.maxsuel.agregadordeinvestimentos.service.TradeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,6 +38,7 @@ public class TradeController {
     private final TradeService tradeService;
     private final TransactionsRepository transactionsRepository;
     private final TransactionMapper transactionMapper;
+    private final AccountService accountService;
 
     @Operation(
             summary = "Execute a buy order",
@@ -108,6 +111,38 @@ public class TradeController {
                         .map(transactionMapper::toDto)
                         .toList()
         );
+    }
+
+    @Operation(
+            summary = "Get consolidated portfolio",
+            description = "Calculates total equity by summing available user cash and real-time stock market values for a specific account.",
+            operationId = "getAccountPortfolio"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Portfolio calculated successfully",
+                    content = @Content(schema = @Schema(implementation = PortfolioResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found or does not belong to the user",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
+    public ResponseEntity<PortfolioResponseDto> getPortfolio(@PathVariable String accountId,
+                                                             @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(accountService.getCompletePortfolio(user, accountId));
     }
 
 }
