@@ -1,5 +1,6 @@
 package github.maxsuel.agregadordeinvestimentos.dto.response.stock;
 
+import github.maxsuel.agregadordeinvestimentos.annotation.JsonBrasiliaTime;
 import github.maxsuel.agregadordeinvestimentos.entity.enums.TradeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -64,6 +65,7 @@ public record TransactionsResponseDto(
                 example = "2026-02-10T15:30:00Z"
         )
         @NotNull
+        @JsonBrasiliaTime
         Instant timestamp
 
 ) {

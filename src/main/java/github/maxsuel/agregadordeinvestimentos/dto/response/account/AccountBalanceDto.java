@@ -1,5 +1,6 @@
 package github.maxsuel.agregadordeinvestimentos.dto.response.account;
 
+import github.maxsuel.agregadordeinvestimentos.annotation.JsonBrasiliaTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
@@ -16,6 +17,7 @@ public record AccountBalanceDto(
 
         @Schema(description = "The exact moment the balance was calculated based on real-time data",
                 example = "2026-01-26T14:48:19Z")
+        @JsonBrasiliaTime
         Instant updatedAt
 ) {
 }
