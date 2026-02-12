@@ -1,5 +1,6 @@
 package github.maxsuel.agregadordeinvestimentos.dto.response.stock;
 
+import github.maxsuel.agregadordeinvestimentos.annotation.JsonBrasiliaTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -28,6 +29,7 @@ public record PortfolioResponseDto(
         @Schema(
                 description = "Timestamp of the real-time calculation"
         )
+        @JsonBrasiliaTime
         Instant updatedAt
 
 ) {
