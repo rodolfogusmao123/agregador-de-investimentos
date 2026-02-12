@@ -135,9 +135,9 @@ public class TradeController {
                     content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
             )
     })
+    @GetMapping("/portfolio/{accountId}")
     public ResponseEntity<PortfolioResponseDto> getPortfolio(@PathVariable String accountId,
                                                              @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
